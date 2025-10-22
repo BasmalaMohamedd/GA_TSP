@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BinaryChromosome implements Chromosome{
-    private double fitness = 0.00;
     private List<Integer> genesList = new ArrayList<>();
     private int determineGeneValue(int gene)
     {
@@ -39,19 +38,6 @@ public class BinaryChromosome implements Chromosome{
     public int getGeneAt(int index)
     {
         return genesList.get(index);
-    }
-
-
-    @Override
-    public void setFitness(double fitness)
-    {
-        this.fitness = fitness;
-    }
-
-    @Override
-    public double getFitness()
-    {
-        return fitness;
     }
 
     @Override
