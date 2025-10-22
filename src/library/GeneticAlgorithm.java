@@ -27,12 +27,13 @@ public abstract class GeneticAlgorithm {
     // protected GenerationIntializater generationIntializater;
     
 
-    public GeneticAlgorithm(int populationSize, int chromosomeLength, float crossoverRate, float mutationRate, Function fitnessFunction)
+    public GeneticAlgorithm(int populationSize, int chromosomeLength, float crossoverRate, float mutationRate,int generations, Function fitnessFunction)
     {
         this.populationSize = populationSize;
         this.chromosomeLength = chromosomeLength;
         this.crossoverRate = crossoverRate;
         this.mutationRate = mutationRate;
+        this.generations = generations;
         this.fitnessFunction = fitnessFunction;
     }
 
@@ -90,7 +91,7 @@ public abstract class GeneticAlgorithm {
         List<Chromosome> currentGeneration = new ArrayList<>();
         currentGeneration.addAll(initialGeneration);
         //check if the similarity between generations is close -> terminate
-        for(int i = 0; i < generations || isOptimal(currentGeneration); i++)
+        for(int i = 0; i < generations && !isOptimal(currentGeneration); i++)
         {
             List<Integer> selecedIndexes = new ArrayList<>();
             selecedIndexes.addAll(selection.select(fitnessList));
