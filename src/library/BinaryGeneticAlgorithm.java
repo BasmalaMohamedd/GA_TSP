@@ -9,8 +9,8 @@ import operators.GenerationIntializater;
 
 public class BinaryGeneticAlgorithm extends GeneticAlgorithm{
 
-    public BinaryGeneticAlgorithm(int populationSize, int chromosomeLength, float crossoverRate, float mutationRate, Function fitnessFunction){
-        super(populationSize, chromosomeLength, crossoverRate, mutationRate, fitnessFunction);
+    public BinaryGeneticAlgorithm(int populationSize, int chromosomeLength, float crossoverRate, float mutationRate, int generations, Function<Chromosome, Double> fitnessFunction){
+        super(populationSize, chromosomeLength, crossoverRate, mutationRate,generations , fitnessFunction);
     }
     
     public List<Chromosome> initializeGenerations(){
@@ -26,13 +26,5 @@ public class BinaryGeneticAlgorithm extends GeneticAlgorithm{
 
     
 
-    public Chromosome run(){
-        List<Double> fitnessList = new ArrayList<>();
-        fitnessList.addAll(evaluateFitness(initializeGenerations()));
-        List<Integer> selectedChromosomesIndexes = new ArrayList<>();
-        selectedChromosomesIndexes.addAll(selection.select(fitnessList));
-
-
-        return null;
-    }
+    
 }

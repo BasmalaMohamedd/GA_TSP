@@ -18,7 +18,7 @@ public abstract class GeneticAlgorithm {
     protected float crossoverRate;
     protected float mutationRate;
     protected int generations;
-    protected Function fitnessFunction;
+    protected Function<Chromosome, Double> fitnessFunction;
     protected Selection selection;
     protected Crossover crossover;
     protected Mutation mutation;
@@ -27,7 +27,7 @@ public abstract class GeneticAlgorithm {
     // protected GenerationIntializater generationIntializater;
     
 
-    public GeneticAlgorithm(int populationSize, int chromosomeLength, float crossoverRate, float mutationRate,int generations, Function fitnessFunction)
+    public GeneticAlgorithm(int populationSize, int chromosomeLength, float crossoverRate, float mutationRate,int generations, Function<Chromosome, Double> fitnessFunction)
     {
         this.populationSize = populationSize;
         this.chromosomeLength = chromosomeLength;
@@ -62,65 +62,42 @@ public abstract class GeneticAlgorithm {
     public abstract List<Chromosome> initializeGenerations();
 
      
-    
-    
-    // public abstract List<Chromosome> select_rankBased();
-
-    // public abstract List<Chromosome> select_tournament();
-
-    // public abstract List<Chromosome> crossover_singlePoint();
-    
-    // public abstract List<Chromosome> crossover_multiplePoint();
-
-    // public abstract List<Chromosome> crossover_uniform();
-
-    // public abstract List<Chromosome> mutation(); //two methods min
-
-    // public abstract List<Chromosome> replacement(); //three methods min
-
     public boolean isOptimal(List<Chromosome> currentGeneration)
     {
         return false;
     }
-    public Chromosome run()
-    {
-        List<Chromosome> initialGeneration = new ArrayList<>();
-        initialGeneration.addAll(initializeGenerations());
-        List<Double> fitnessList = new ArrayList<>();
-        fitnessList.addAll(evaluateFitness(initialGeneration));
-        List<Chromosome> currentGeneration = new ArrayList<>();
-        currentGeneration.addAll(initialGeneration);
-        //check if the similarity between generations is close -> terminate
-        for(int i = 0; i < generations && !isOptimal(currentGeneration); i++)
-        {
-            List<Integer> selecedIndexes = new ArrayList<>();
-            selecedIndexes.addAll(selection.select(fitnessList));
+
+
+    public Chromosome run() {
+        List<Chromosome> currentGeneration = initializeGenerations();
+        List<Double> fitnessList = evaluateFitness(currentGeneration);
+
+        for (int i = 0; i < generations && !isOptimal(currentGeneration); i++) {
+            List<Integer> selectedIndexes = selection.select(fitnessList);
             List<Chromosome> parents = new ArrayList<>();
-            //if index matches the currentchromosome index add the chromosome to list
-            for(int j = 0; j < selecedIndexes.size(); j++)
-            {
-                for(int k = 0; k < selecedIndexes.size(); k++)
-                {
-                    parents.add(currentGeneration.get(j));
-                }
+            for (int index : selectedIndexes) {
+                parents.add(currentGeneration.get(index));
             }
 
-            List<Chromosome> children = new ArrayList<>();
+            List<Chromosome> children = crossover.cross(parents);
 
-            children.addAll(crossover.cross(parents));
-            List<Chromosome> parentsAfterMutation = new ArrayList<>();
-            List<Chromosome> childrenAfterMutation = new ArrayList<>();
+            List<Chromosome> mutatedParents = mutation.mutate(parents);
+            List<Chromosome> mutatedChildren = mutation.mutate(children);
 
-            parentsAfterMutation.addAll(mutation.mutate(parents));
-            childrenAfterMutation.addAll(mutation.mutate(children));
-            currentGeneration.clear();
-            currentGeneration.addAll(replacement.replace(parentsAfterMutation, childrenAfterMutation));
-            fitnessList.clear();
-            fitnessList.addAll(evaluateFitness(currentGeneration));
-
+            currentGeneration = replacement.replace(mutatedParents, mutatedChildren);
+            fitnessList = evaluateFitness(currentGeneration);
         }
 
+        Chromosome best = currentGeneration.get(0);
+        double bestFitness = fitnessList.get(0);
+        for (int i = 1; i < fitnessList.size(); i++) {
+            if (fitnessList.get(i) > bestFitness) {
+                bestFitness = fitnessList.get(i);
+                best = currentGeneration.get(i);
+            }
+        }
 
-        return null;
+        return best;
     }
+
 }
