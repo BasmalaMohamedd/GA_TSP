@@ -2,8 +2,6 @@ package operators;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import core.Chromosome;
 import util.RouletteWheel;
 
 public class RouletteWheelSelection implements Selection{

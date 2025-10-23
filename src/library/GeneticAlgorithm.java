@@ -6,7 +6,6 @@ import java.util.function.Function;
 
 import core.Chromosome;
 import operators.Crossover;
-import operators.GenerationIntializater;
 import operators.Mutation;
 import operators.Replacement;
 import operators.Selection;
@@ -23,8 +22,6 @@ public abstract class GeneticAlgorithm {
     protected Crossover crossover;
     protected Mutation mutation;
     protected Replacement replacement;
-
-    // protected GenerationIntializater generationIntializater;
     
 
     public GeneticAlgorithm(int populationSize, int chromosomeLength, float crossoverRate, float mutationRate,int generations, Function<Chromosome, Double> fitnessFunction)
@@ -79,7 +76,7 @@ public abstract class GeneticAlgorithm {
                 parents.add(currentGeneration.get(index));
             }
 
-            List<Chromosome> children = crossover.cross(parents);
+            List<Chromosome> children = crossover.cross(parents, chromosomeLength, crossoverRate);
 
             List<Chromosome> mutatedParents = mutation.mutate(parents);
             List<Chromosome> mutatedChildren = mutation.mutate(children);
