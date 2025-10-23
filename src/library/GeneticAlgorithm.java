@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.function.Function;
 
 import core.Chromosome;
+import core.InfeasibilityCheck;
 import operators.Crossover;
 import operators.Mutation;
 import operators.Replacement;
 import operators.Selection;
 
 public abstract class GeneticAlgorithm {
-    //initialize types of genetic algorithm steps 
+    
     protected int populationSize;
     protected int chromosomeLength;
     protected float crossoverRate;
@@ -22,6 +23,7 @@ public abstract class GeneticAlgorithm {
     protected Crossover crossover;
     protected Mutation mutation;
     protected Replacement replacement;
+    protected InfeasibilityCheck infeasibilityCheck;
     
 
     public GeneticAlgorithm(int populationSize, int chromosomeLength, float crossoverRate, float mutationRate,int generations, Function<Chromosome, Double> fitnessFunction)
@@ -50,6 +52,34 @@ public abstract class GeneticAlgorithm {
         this.replacement = replacement;
     }
 
+    public void setInfeasibilityCheck(InfeasibilityCheck infeasibilityCheck) {
+        this.infeasibilityCheck = infeasibilityCheck;
+    }
+
+    public void setPopulationSize(int populationSize) {
+        this.populationSize = populationSize;
+    }
+
+    public void setChromosomeLength(int chromosomeLength) {
+        this.chromosomeLength = chromosomeLength;
+    }
+
+    public void setCrossoverRate(float crossoverRate) {
+        this.crossoverRate = crossoverRate;
+    }
+
+    public void setMutationRate(float mutationRate) {
+        this.mutationRate = mutationRate;
+    }
+
+    public void setGenerations(int generations) {
+        this.generations = generations;
+    }
+
+    public void setFitnessFunction(Function<Chromosome, Double> fitnessFunction) {
+        this.fitnessFunction = fitnessFunction;
+    }
+
 
     public abstract List<Double> evaluateFitness(List<Chromosome> currentGeneration);
 
@@ -67,7 +97,16 @@ public abstract class GeneticAlgorithm {
 
     public Chromosome run() {
         List<Chromosome> currentGeneration = initializeGenerations();
+        
+        
+        if (infeasibilityCheck != null) {
+            currentGeneration = removeInfeasible(currentGeneration);
+        }
+        
         List<Double> fitnessList = evaluateFitness(currentGeneration);
+
+        Chromosome globalBest = currentGeneration.get(0);
+        double globalBestFitness = fitnessList.get(0);
 
         for (int i = 0; i < generations && !isOptimal(currentGeneration); i++) {
             List<Integer> selectedIndexes = selection.select(fitnessList);
@@ -81,20 +120,53 @@ public abstract class GeneticAlgorithm {
             List<Chromosome> mutatedParents = mutation.mutate(parents);
             List<Chromosome> mutatedChildren = mutation.mutate(children);
 
-            currentGeneration = replacement.replace(mutatedParents, mutatedChildren);
-            fitnessList = evaluateFitness(currentGeneration);
-        }
+            
+            if (infeasibilityCheck != null) {
+                mutatedParents = removeInfeasible(mutatedParents);
+                mutatedChildren = removeInfeasible(mutatedChildren);
+            }
 
-        Chromosome best = currentGeneration.get(0);
-        double bestFitness = fitnessList.get(0);
-        for (int i = 1; i < fitnessList.size(); i++) {
-            if (fitnessList.get(i) > bestFitness) {
-                bestFitness = fitnessList.get(i);
-                best = currentGeneration.get(i);
+            currentGeneration = replacement.replace(mutatedParents, mutatedChildren);
+            
+           
+            while (currentGeneration.size() > populationSize) {
+                currentGeneration.remove(currentGeneration.size() - 1);
+            }
+            
+            fitnessList = evaluateFitness(currentGeneration);
+
+          
+            for (int j = 0; j < fitnessList.size(); j++) {
+                if (fitnessList.get(j) > globalBestFitness) {
+                    globalBestFitness = fitnessList.get(j);
+                    globalBest = currentGeneration.get(j);
+                }
+            }
+
+          
+            if ((i + 1) % 20 == 0) {
+                System.out.println("Generation " + (i + 1) + ": Best Fitness = " + 
+                                   String.format("%.4f", globalBestFitness));
             }
         }
 
-        return best;
+        return globalBest;
+    }
+
+    private List<Chromosome> removeInfeasible(List<Chromosome> population) {
+        List<Chromosome> feasible = new ArrayList<>();
+        for (Chromosome chromosome : population) {
+            if (!infeasibilityCheck.isInfeasible(chromosome)) {
+                feasible.add(chromosome);
+            }
+        }
+        
+        
+        if (feasible.isEmpty()) {
+            return population;
+        }
+        
+        return feasible;
     }
 
 }
