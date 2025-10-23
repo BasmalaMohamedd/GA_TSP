@@ -11,13 +11,11 @@ public class RouletteWheel{
     {
         this.commulativeFitnessList = new ArrayList<>();
         this.commulativeFitnessList.add(fitnessList.get(0));
-        for(int i = 0; i < fitnessList.size(); i++)
+        for(int i = 1; i < fitnessList.size(); i++)
         {
-            this.commulativeFitnessList.add(fitnessList.get(i) + fitnessList.get(i - 1));
+            this.commulativeFitnessList.add(fitnessList.get(i) + this.commulativeFitnessList.get(i - 1));
         }
         this.sum = commulativeFitnessList.get(commulativeFitnessList.size() - 1);
-        
-
     }
 
     private double spin()

@@ -17,8 +17,6 @@ public class RouletteWheelSelection implements Selection{
             selectedChromosomesIndexes.add(rouletteWheel.spin_and_getIndex());
         }
 
-        System.out.println(selectedChromosomesIndexes);
-
         return selectedChromosomesIndexes;
     }
 

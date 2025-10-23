@@ -11,21 +11,12 @@ public class BinaryGenerationIntialization implements GenerationIntializater{
         List<Chromosome> chromosomes = new ArrayList<>();
         for(int i = 0; i < populationSize; i ++)
         {
-            
             Chromosome chromosome = new BinaryChromosome();
-
             chromosome.randomize(chromosomeLength);
-
             chromosomes.add(chromosome);
         }
-        for(int i = 0; i < populationSize; i++)
-        {
-            System.out.println(chromosomes.get(i).getGenesList());
-        }
-
         
         return chromosomes;
-
     }
 
 }
