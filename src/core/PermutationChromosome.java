@@ -9,6 +9,11 @@ public class PermutationChromosome implements Chromosome {
 
     public PermutationChromosome() {
     }
+    public void addGene(int gene)
+    {
+        genesList.add(gene);
+        
+    }
 
     public PermutationChromosome(List<Integer> genes) {
         this.genesList = new ArrayList<>(genes);
@@ -37,13 +42,24 @@ public class PermutationChromosome implements Chromosome {
         return genesList.get(index);
     }
 
-    public void setGene(int index, int value) {
+    public void setGene(int index, double value) {
         if (index >= 0 && index < genesList.size()) {
-            genesList.set(index, value);
+            genesList.set(index, (int)value);
         }
     }
 
     public void setGenesList(List<Integer> genes) {
         this.genesList = new ArrayList<>(genes);
     }
+
+    public Chromosome clone()
+    {
+        PermutationChromosome copy = new PermutationChromosome();
+        for (int gene : this.genesList) {
+            copy.addGene(gene);
+        }
+        return copy;
+    }
+
 }
+
