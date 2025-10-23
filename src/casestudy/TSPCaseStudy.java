@@ -58,7 +58,7 @@ public class TSPCaseStudy {
                 PermutationChromosome tour = (PermutationChromosome) chromosome;
                 List<Integer> genes = tour.getGenesList();
                 
-              s
+                // Check for duplicate cities
                 for (int i = 0; i < genes.size(); i++) {
                     for (int j = i + 1; j < genes.size(); j++) {
                         if (genes.get(i).equals(genes.get(j))) {
